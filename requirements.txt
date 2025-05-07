@@ -1,18 +1,16 @@
-# Python 3.10+ is recommended for SAM2
+# Python 3.10+ is required (provided by the base Docker image)
 
-# PyTorch (Version >= 2.5.1 with CUDA 12.1, as recommended for SAM2)
-# Find the exact install command from: https://pytorch.org/get-started/locally/
+# PyTorch (Version 2.3.1 with CUDA 12.1, as used internally by SAM2)
 # Ensure your Kubeflow environment supports CUDA 12.1 if using GPU.
-torch==2.5.1+cu121
-torchvision==0.20.1+cu121
-torchaudio==2.5.1+cu121
+torch==2.3.1+cu121
+torchvision==0.18.1+cu121 # Matched to PyTorch 2.3.1 for CUDA 12.1
+torchaudio==2.3.1+cu121 # Matched to PyTorch 2.3.1 for CUDA 12.1
 # If you need a CPU-only version, comment the lines above and uncomment these:
-# torch==2.5.1
-# torchvision==0.20.1
-# torchaudio==2.5.1
+# torch==2.3.1
+# torchvision==0.18.1
+# torchaudio==2.3.1
 
 # SAM2 from the official Facebook Research GitHub repository
-# This installs the package 'sam2'
 git+https://github.com/facebookresearch/sam2.git
 
 # Geospatial raster data handling
