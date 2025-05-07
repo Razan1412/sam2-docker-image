@@ -2,8 +2,6 @@
 name: Build and Push SAM2 Kubeflow Docker Image
 
 # Controls when the action will run.
-# Triggers the workflow on push events but only for the main/master branch,
-# or when manually triggered (workflow_dispatch).
 on:
   push:
     branches:
@@ -22,12 +20,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4 # Use a more recent version
+        uses: actions/checkout@v4
 
-      - name: Set up QEMU (for multi-platform builds - optional but good practice)
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx (enables more advanced build features)
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
@@ -37,6 +35,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}    # GitHub repository secret
 
       - name: Build and push Docker image
+        id: build-and-push
         uses: docker/build-push-action@v5
         with:
           context: . # Build context is the root of the repository
@@ -44,13 +43,11 @@ jobs:
           push: true # Actually push the image to the registry
           tags: | # Define image tags
             ${{ secrets.DOCKERHUB_USERNAME }}/sam2-kubeflow-env:latest
-            # You can add more tags, e.g., based on Git commit SHA or a version number
-            # ${{ secrets.DOCKERHUB_USERNAME }}/sam2-kubeflow-env:${{ github.sha }}
-            # If triggering on Git tags:
-            # ${{ github.ref_type == 'tag' && format('{0}/{1}:{2}', secrets.DOCKERHUB_USERNAME, 'sam2-kubeflow-env', github.ref_name) || '' }}
-          # Optional: Add build arguments, labels, cache settings etc.
-          # labels: |
-          #   org.opencontainers.image.source=${{ github.repositoryUrl }}
-          #   org.opencontainers.image.revision=${{ github.sha }}
-          # cache-from: type=gha
-          # cache-to: type=gha,mode=max
+            ${{ secrets.DOCKERHUB_USERNAME }}/sam2-kubeflow-env:${{ github.sha }}
+          # If you want to tag based on actual Git tags, you can use a condition:
+          # Example: ${{ github.ref_type == 'tag' && format('{0}/{1}:{2}', secrets.DOCKERHUB_USERNAME, 'sam2-kubeflow-env', github.ref_name) || '' }}
+          # For simplicity, the two tags above (latest and commit SHA) are good starting points.
+
+      - name: Image digest
+        run: echo ${{ steps.build-and-push.outputs.digest }}
+
